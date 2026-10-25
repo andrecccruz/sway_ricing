@@ -1,0 +1,19 @@
+# Backrooms: espaço liminar amarelado. Papel de parede mono-amarelo, carpete
+# úmido e luz fluorescente. Tema claro. Wallpaper gerado.
+nome = "Backrooms"
+esquema = "light"
+papel = "~/.local/share/backgrounds/backrooms.png"
+
+[cores]
+fundo    = "#d9cc8f"
+tinta    = "#3d3518"
+texto    = "#3d3518"
+brilho   = "#1f1a08"
+destaque = "#7a5c10"
+alerta   = "#9c3b1f"
+
+[terminal]
+fundo  = "#e6dcaa"
+texto  = "#3d3518"
+normal = ["#cfc394", "#9c3b1f", "#5e6b1f", "#8a6410", "#3f5a6b", "#7a4a5e", "#3d6b5e", "#3d3518"]
+claro  = ["#8f8250", "#b5502f", "#75842a", "#a67a18", "#527080", "#935d73", "#4f8273", "#1f1a08"]

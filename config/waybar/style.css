@@ -1,0 +1,159 @@
+/* Tema minimalista: cápsula sólida, texto fino, um único destaque. Cores no bloco TEMA. */
+
+/* TEMA-INICIO (gerado por ~/.config/temas/tema, não edite este bloco) */
+@define-color fundo #060c14;
+@define-color superficie rgba(143, 216, 255, 0.07);
+@define-color superficie_forte rgba(143, 216, 255, 0.12);
+@define-color trilho rgba(143, 216, 255, 0.15);
+@define-color contorno rgba(143, 216, 255, 0.12);
+@define-color texto rgba(207, 227, 240, 0.8);
+@define-color apagado rgba(207, 227, 240, 0.42);
+@define-color brilho #ffffff;
+@define-color destaque #3fd0ff;
+@define-color destaque_suave rgba(63, 208, 255, 0.16);
+@define-color destaque_borda rgba(63, 208, 255, 0.5);
+@define-color alerta #ff9a3c;
+@define-color veu rgba(6, 12, 20, 0.95);
+/* TEMA-FIM */
+
+* {
+    border:        none;
+    border-radius: 0;
+    font-family:   "Source Sans Pro", "FontAwesome 6 Free";
+    font-weight:   300;
+    font-size:     14px;
+    box-shadow:    none;
+    text-shadow:   none;
+    min-height:    0;
+}
+
+/* Mesma cor da dynamic island (eww), sem borda: as duas parecem uma peça só. */
+/* O fundo arredondado fica na caixa de dentro: arredondar a própria janela
+   faz o GTK pintar de preto o lado de fora dos cantos. */
+window#waybar {
+    background: transparent;
+    color: @texto;
+}
+
+window#waybar > box {
+    background: @fundo;
+    border-radius: 16px;
+}
+
+tooltip {
+    background: @fundo;
+    border: 1px solid @contorno;
+    border-radius: 10px;
+}
+
+tooltip label {
+    color: @texto;
+    padding: 2px 4px;
+}
+
+/* Espaço entre os módulos */
+.modules-left > widget > *,
+.modules-right > widget > * {
+    padding: 0 9px;
+}
+
+.modules-left  { margin-left: 8px; }
+.modules-right { margin-right: 8px; }
+
+/* Áreas de trabalho: números discretos, a atual em destaque com um traço embaixo */
+#workspaces {
+    padding: 0;
+}
+
+#workspaces button {
+    padding: 0 7px;
+    margin: 5px 1px;
+    color: @apagado;
+    background: transparent;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.25s ease;
+}
+
+#workspaces button:hover {
+    color: @texto;
+    background: transparent;
+    box-shadow: none;
+}
+
+#workspaces button.focused {
+    color: @brilho;
+    border-bottom: 2px solid @destaque;
+}
+
+#workspaces button.urgent {
+    color: @alerta;
+}
+
+#mode {
+    color: @destaque;
+    letter-spacing: 1px;
+}
+
+#window {
+    color: @apagado;
+    letter-spacing: 0.5px;
+}
+
+window#waybar.empty #window {
+    color: transparent;
+}
+
+#clock {
+    color: @brilho;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+}
+
+#custom-layout {
+    letter-spacing: 1px;
+}
+
+#custom-layout.br {
+    color: @destaque;
+}
+
+#custom-cava {
+    color: @destaque;
+    font-family: "DejaVu Sans Mono";
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+#custom-menu,
+#custom-notification {
+    color: @texto;
+}
+
+#custom-menu:hover,
+#custom-notification:hover,
+#custom-layout:hover,
+#clock:hover {
+    color: @brilho;
+}
+
+#custom-zypper {
+    color: @apagado;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: @destaque;
+}
+
+#battery.warning:not(.charging) {
+    color: @destaque;
+}
+
+#battery.critical:not(.charging) {
+    color: @alerta;
+}
+
+#tray > .needs-attention {
+    color: @alerta;
+}

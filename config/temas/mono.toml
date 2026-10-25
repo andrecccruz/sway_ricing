@@ -1,0 +1,18 @@
+# Monocromático: só preto e cinzas, o destaque é o próprio branco.
+nome = "Mono"
+esquema = "dark"
+papel = "#141414"
+
+[cores]
+fundo    = "#0c0c0c"
+tinta    = "#ffffff"
+texto    = "#e6e6e6"
+brilho   = "#ffffff"
+destaque = "#ffffff"
+alerta   = "#d98c8c"
+
+[terminal]
+fundo  = "#0c0c0c"
+texto  = "#d4d4d4"
+normal = ["#1c1c1c", "#c27a7a", "#9db48f", "#c9b27c", "#8aa1b8", "#a891b0", "#8fb2b0", "#d4d4d4"]
+claro  = ["#5a5a5a", "#d08f8f", "#b0c7a2", "#dcc58f", "#9db4cb", "#bba4c3", "#a2c5c3", "#ffffff"]

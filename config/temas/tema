@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+"""Troca o tema de todo o desktop a partir de ~/.config/temas/<id>.toml.
+
+Uso:  tema <id>     aplica o tema (ex.: tema nord)
+      tema lista    JSON com os temas disponíveis (usado pelo menu do eww)
+      tema atual    id do tema em uso
+
+Cada tema define 6 cores; as tonalidades derivadas (superfícies, trilhos,
+contornos) saem delas. O script reescreve só o bloco TEMA-INICIO/TEMA-FIM de
+cada estilo e aplica tudo ao vivo, sem recarregar o sway.
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import tomllib
+from pathlib import Path
+
+HOME = Path.home()
+DIR = HOME / ".config/temas"
+ATUAL = DIR / "atual"
+
+
+def rgba(hexcor, alfa):
+    h = hexcor.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return f"rgba({r}, {g}, {b}, {alfa})"
+
+
+def carregar(id_):
+    with open(DIR / f"{id_}.toml", "rb") as f:
+        return tomllib.load(f)
+
+
+def variaveis(t):
+    c = t["cores"]
+    return {
+        "fundo": c["fundo"],
+        "superficie": rgba(c["tinta"], 0.07),
+        "superficie_forte": rgba(c["tinta"], 0.12),
+        "trilho": rgba(c["tinta"], 0.15),
+        "contorno": rgba(c["tinta"], 0.12),
+        "texto": rgba(c["texto"], 0.80),
+        "apagado": rgba(c["texto"], 0.42),
+        "brilho": c["brilho"],
+        "destaque": c["destaque"],
+        "destaque_suave": rgba(c["destaque"], 0.16),
+        "destaque_borda": rgba(c["destaque"], 0.5),
+        "alerta": c["alerta"],
+        "veu": rgba(c["fundo"], 0.95),
+    }
+
+
+def trocar_bloco(caminho, linhas, comentario):
+    """Substitui o conteúdo entre os marcadores TEMA-INICIO e TEMA-FIM."""
+    abre, fecha = comentario
+    texto = caminho.read_text(encoding="utf-8")
+    padrao = re.compile(
+        rf"({re.escape(abre)} TEMA-INICIO[^\n]*\n).*?({re.escape(abre)} TEMA-FIM)", re.S)
+    if not padrao.search(texto):
+        print(f"tema: marcadores não encontrados em {caminho}", file=sys.stderr)
+        return
+    corpo = "".join(l + "\n" for l in linhas)
+    caminho.write_text(padrao.sub(lambda m: m.group(1) + corpo + m.group(2), texto),
+                       encoding="utf-8")
+
+
+def sway_linhas(t):
+    c = t["cores"]
+    papel = os.path.expanduser(t["papel"])
+    if papel.startswith("#"):
+        bg = f"output * bg {papel} solid_color"
+    else:
+        bg = f"output * bg {papel} fill {c['fundo']}"
+    tinta = c["tinta"]
+    return [
+        bg,
+        f"client.focused {tinta}70 {c['fundo']} {c['brilho']} {tinta}70 {tinta}70",
+        f"client.focused_inactive {tinta}30 {c['fundo']} {c['texto']} {tinta}30 {tinta}30",
+        f"client.unfocused {tinta}1a {c['fundo']} {c['texto']} {tinta}1a {tinta}1a",
+        f"client.urgent {c['alerta']} {c['fundo']} {c['brilho']} {c['alerta']} {c['alerta']}",
+    ]
+
+
+def gtk_comandos(t):
+    escuro = t.get("esquema", "dark") == "dark"
+    return [
+        ["gsettings", "set", "org.gnome.desktop.interface", "color-scheme",
+         "prefer-dark" if escuro else "prefer-light"],
+        ["gsettings", "set", "org.gnome.desktop.interface", "gtk-theme",
+         "Adwaita-dark" if escuro else "Adwaita"],
+    ]
+
+
+def alacritty_toml(t):
+    term = t.get("terminal")
+    if not term:
+        return "# Tema sem cores de terminal: vale a config do openSUSE.\n"
+    nomes = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
+    out = ["[colors.primary]", f'background = "{term["fundo"]}"',
+           f'foreground = "{term["texto"]}"', "", "[colors.normal]"]
+    out += [f'{n} = "{v}"' for n, v in zip(nomes, term["normal"])]
+    out += ["", "[colors.bright]"]
+    out += [f'{n} = "{v}"' for n, v in zip(nomes, term["claro"])]
+    return "\n".join(out) + "\n"
+
+
+def rodar(*cmd):
+    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def recarregar_eww(tentativas=5):
+    """O daemon do eww às vezes recusa o reload quando está ocupado
+    ("Resource temporarily unavailable"); tenta de novo até aceitar."""
+    for _ in range(tentativas):
+        r = subprocess.run(["eww", "reload"], capture_output=True, text=True)
+        if r.returncode == 0 and "error" not in (r.stdout + r.stderr).lower():
+            return
+        time.sleep(0.4)
+    print("tema: não consegui recarregar o eww", file=sys.stderr)
+
+
+def aplicar(id_):
+    t = carregar(id_)
+    v = variaveis(t)
+
+    trocar_bloco(HOME / ".config/eww/eww.scss",
+                 [f"${k}: {x};" for k, x in v.items()], ("//", ""))
+    css = [f"@define-color {k} {x};" for k, x in v.items()]
+    trocar_bloco(HOME / ".config/waybar/style.css", css, ("/*", "*/"))
+    trocar_bloco(HOME / ".config/wofi/style.css", css, ("/*", "*/"))
+
+    # Sway: grava para os próximos logins e aplica agora.
+    linhas = sway_linhas(t)
+    gtk = gtk_comandos(t)
+    (HOME / ".config/sway/config.d/cores.conf").write_text(
+        f"# Gerado por ~/.config/temas/tema (tema: {t['nome']}). Não edite à mão.\n"
+        + "".join(l + "\n" for l in linhas)
+        + "".join("exec_always " + " ".join(c[:3]) + f" {c[3]} '{c[4]}'\n" for c in gtk),
+        encoding="utf-8")
+    for l in linhas:
+        rodar("swaymsg", l)
+    for c in gtk:
+        rodar(*c)
+
+    (HOME / ".config/alacritty/cores.toml").write_text(alacritty_toml(t), encoding="utf-8")
+
+    rodar("pkill", "-SIGUSR2", "-x", "waybar")
+    recarregar_eww()
+    ATUAL.write_text(id_ + "\n")
+
+
+def lista():
+    atual = ATUAL.read_text().strip() if ATUAL.exists() else ""
+    temas = []
+    for p in sorted(DIR.glob("*.toml")):
+        t = carregar(p.stem)
+        c = t["cores"]
+        temas.append({"id": p.stem, "nome": t["nome"], "fundo": c["fundo"],
+                      "texto": c["texto"], "destaque": c["destaque"],
+                      "atual": p.stem == atual})
+    print(json.dumps(temas, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    arg = sys.argv[1] if len(sys.argv) > 1 else "lista"
+    if arg == "lista":
+        lista()
+    elif arg == "atual":
+        print(ATUAL.read_text().strip() if ATUAL.exists() else "")
+    elif (DIR / f"{arg}.toml").exists():
+        aplicar(arg)
+    else:
+        sys.exit(f"tema: '{arg}' não existe em {DIR}")

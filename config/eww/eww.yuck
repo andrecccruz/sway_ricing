@@ -1,0 +1,215 @@
+;; Dynamic island pendurada no centro da waybar, como uma aba que continua a barra.
+;; Fechada: hora e data (ou um aviso rápido de volume/brilho/teclado por 1,5 s).
+;; Passando o mouse: cresce para baixo com música, volume, brilho e botões rápidos.
+
+(defvar aberta false)  ; anima o painel (revealer)
+
+;; Aviso rápido (scripts/aviso.sh): troca a hora pelo valor por um instante.
+(defvar aviso false)
+(defvar aviso_icone "")
+(defvar aviso_valor 0)    ; 0-100; -1 = sem barra
+(defvar aviso_texto "")
+
+(deflisten musica
+  :initial '{"status":"","title":"","artist":"","art":"","length":0}'
+  "~/.config/eww/scripts/musica.sh")
+
+(defpoll hora :interval "5s" "date +%H:%M")
+(defpoll data :interval "60s" "LC_TIME=pt_BR.UTF-8 date '+%a, %d de %b'")
+
+;; Só atualizam com a island aberta.
+(defpoll posicao :interval "1s" :run-while aberta :initial "0"
+  "playerctl position 2>/dev/null | cut -d. -f1 | grep . || echo 0")
+(defpoll volume :interval "1s" :run-while aberta :initial "0" "pamixer --get-volume")
+(defpoll mudo :interval "1s" :run-while aberta :initial "false" "pamixer --get-mute || true")
+(defpoll brilho :interval "2s" :run-while aberta :initial "0"
+  "brightnessctl -m | cut -d, -f4 | tr -d %")
+(defpoll wifi :interval "2s" :run-while aberta :initial "enabled" "nmcli radio wifi")
+(defpoll bt :interval "2s" :run-while aberta :initial "off"
+  "bluetoothctl show | grep -q 'Powered: yes' && echo on || echo off")
+(defpoll dnd :interval "2s" :run-while aberta :initial "false" "swaync-client -D")
+
+;; As duas janelas começam na mesma altura do topo da waybar. O y negativo
+;; desfaz o empurrão que o sway dá para fora da área reservada da barra.
+;; Janelas do eww não encolhem no Wayland, por isso a cápsula tem tamanho fixo
+;; e o painel é uma segunda janela, aberta no hover.
+(defwindow ilha
+  :monitor 0
+  :geometry (geometry :x "0px" :y "-30px" :width "340px" :height "44px" :anchor "top center")
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  :namespace "ilha"
+  (box :class "aba" :halign "center" :valign "start"
+    (eventbox :onhover "~/.config/eww/scripts/ilha.sh abrir"
+      (compacta))))
+
+(defwindow ilha-painel
+  :monitor 0
+  :geometry (geometry :x "0px" :y "-30px" :width "500px" :height "380px" :anchor "top center")
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  :namespace "ilha"
+  (box :class "aba ${aberta ? 'aberta' : ''}" :halign "center" :valign "start"
+    (eventbox :onhoverlost "~/.config/eww/scripts/ilha.sh fechar &"
+      (box :orientation "v" :space-evenly false
+        (compacta)
+        (revealer :reveal aberta :transition "slidedown" :duration "300ms"
+          (painel))))))
+
+;; Atenção: o eww dá a cada janela uma classe CSS com o nome dela. Por isso a aba
+;; usa a classe "aba", e não "ilha": com "ilha", o fundo e os cantos redondos
+;; valiam também para a janela inteira e os cantos dela saíam pretos.
+
+(defwidget compacta []
+  (box :class "compacta" :halign "center"
+    (box :visible {!aviso} :space-evenly false :spacing 10 :halign "center"
+      (label :class "hora" :text hora)
+      (label :class "ponto" :text "·")
+      (label :class "data" :text data))
+    (box :visible aviso :class "aviso" :space-evenly false :spacing 12 :halign "center"
+      (label :class "aviso-icone" :text aviso_icone)
+      (scale :class "aviso-barra" :visible {aviso_valor >= 0} :active false
+             :min 0 :max 101 :value {aviso_valor >= 0 ? aviso_valor : 0})
+      (label :class "aviso-texto" :text aviso_texto))))
+
+(defwidget painel []
+  (box :class "painel" :orientation "v" :space-evenly false :spacing 14
+    (musica-painel)
+    (linha-slider
+      :icone {mudo == "true" ? "" : ""}
+      :clique "pamixer -t"
+      :valor volume
+      :min 0
+      :ao-mudar "pamixer --set-volume {}")
+    (linha-slider
+      :icone ""
+      :clique ""
+      :valor brilho
+      :min 1
+      :ao-mudar "brightnessctl -q set {}%")
+    (box :class "botoes" :spacing 10
+      (botao-rapido
+        :icone "" :nome "Wi-Fi" :ativo {wifi == "enabled"}
+        :clique "nmcli radio wifi $([ \"$(nmcli radio wifi)\" = enabled ] && echo off || echo on)"
+        :direito "~/.config/waybar/scripts/menu.sh wifi &")
+      (botao-rapido
+        :icone "" :nome "Bluetooth" :ativo {bt == "on"}
+        :clique "bluetoothctl power $(bluetoothctl show | grep -q 'Powered: yes' && echo off || echo on)"
+        :direito "~/.config/waybar/scripts/menu.sh bluetooth &")
+      (botao-rapido
+        :icone "" :nome "Não perturbe" :ativo {dnd == "true"}
+        :clique "swaync-client -d -sw"
+        :direito "")
+      (botao-rapido
+        :icone "" :nome "Tema" :ativo false
+        :clique "~/.config/eww/scripts/temas.sh abrir &"
+        :direito "")
+      (botao-rapido
+        :icone "" :nome "Energia" :ativo false
+        :clique "~/.config/eww/scripts/energia.sh abrir &"
+        :direito ""))))
+
+(defwidget musica-painel []
+  (box :orientation "v"
+    (box :class "musica" :visible {musica.status != ""} :space-evenly false :spacing 14
+      (box :class "capa" :width 72 :height 72 :valign "center"
+           :style {musica.art != "" ? "background-image: url('${musica.art}');" : ""})
+      (box :orientation "v" :space-evenly false :hexpand true :valign "center" :spacing 2
+        (label :class "titulo" :halign "start" :limit-width 34 :text {musica.title})
+        (label :class "artista" :halign "start" :limit-width 34 :text {musica.artist})
+        (scale :class "progresso" :active false :min 0
+               :max {musica.length > 0 ? musica.length : 1} :value posicao)
+        (box :class "controles" :halign "start" :space-evenly false :spacing 20
+          (button :onclick "playerctl previous" "")
+          (button :onclick "playerctl play-pause"
+                  {musica.status == "Playing" ? "" : ""})
+          (button :onclick "playerctl next" ""))))
+    (label :class "sem-musica" :visible {musica.status == ""} :text "Nada tocando")))
+
+(defwidget linha-slider [icone clique valor min ao-mudar]
+  (box :class "linha" :space-evenly false :spacing 12
+    (button :class "icone" :onclick clique icone)
+    (scale :class "slider" :hexpand true :min min :max 101 :value valor :onchange ao-mudar)
+    (label :class "valor" :text "${valor}%")))
+
+(defwidget botao-rapido [icone nome ativo clique direito]
+  (button :class "rapido ${ativo ? 'ativo' : ''}" :onclick clique :onrightclick direito
+    (box :orientation "v" :space-evenly false :spacing 4
+      (label :class "rapido-icone" :text icone)
+      (label :class "rapido-nome" :text nome))))
+
+;; Tela de energia em tela cheia (scripts/energia.sh). Clicar fora fecha.
+(defwindow energia
+  :monitor 0
+  :geometry (geometry :width "100%" :height "100%" :anchor "center")
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  :namespace "energia"
+  (eventbox :class "energia-fundo" :onclick "~/.config/eww/scripts/energia.sh fechar"
+    (box :class "energia" :orientation "v" :space-evenly false :valign "center" :halign "center" :spacing 36
+      (label :class "energia-titulo" :text "Até logo")
+      (box :space-evenly false :spacing 28 :halign "center"
+        (botao-energia :icone "" :nome "Bloquear" :tecla "B" :acao "bloquear")
+        (botao-energia :icone "" :nome "Suspender" :tecla "S" :acao "suspender")
+        (botao-energia :icone "" :nome "Sair" :tecla "E" :acao "sair")
+        (botao-energia :icone "" :nome "Reiniciar" :tecla "R" :acao "reiniciar")
+        (botao-energia :icone "" :nome "Desligar" :tecla "D" :acao "desligar"))
+      (label :class "energia-dica" :text "Esc para cancelar"))))
+
+(defwidget botao-energia [icone nome tecla acao]
+  (box :orientation "v" :space-evenly false :spacing 12
+    (button :class "botao-energia" :onclick "~/.config/eww/scripts/energia.sh ${acao} &"
+      (label :text icone))
+    (label :class "energia-nome" :text nome)
+    (label :class "energia-tecla" :text tecla)))
+
+;; Seletor de temas (scripts/temas.sh). A lista vem de ~/.config/temas/*.toml.
+(defvar temas "[]")
+
+(defwindow temas
+  :monitor 0
+  :geometry (geometry :width "100%" :height "100%" :anchor "center")
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  :namespace "temas"
+  (eventbox :class "temas-fundo" :onclick "~/.config/eww/scripts/temas.sh fechar"
+    (box :class "temas" :orientation "v" :space-evenly false :valign "center" :halign "center" :spacing 22
+      (label :class "temas-titulo" :text "Tema")
+      (box :space-evenly false :spacing 18 :halign "center"
+        (for t in temas
+          (button :class "tema ${t.atual ? 'atual' : ''}"
+                  :onclick "~/.config/eww/scripts/temas.sh aplicar ${t.id} &"
+            (box :orientation "v" :space-evenly false :spacing 10
+              (box :class "amostra" :style "background-color: ${t.fundo};"
+                   :space-evenly false :spacing 8 :halign "center"
+                (box :class "bolinha" :valign "center" :style "background-color: ${t.texto};")
+                (box :class "bolinha" :valign "center" :style "background-color: ${t.destaque};"))
+              (label :class "tema-nome" :text {t.nome})))))
+      (label :class "temas-dica" :text "Clique para aplicar · Esc para fechar"))))
+
+;; Boas-vindas na área de trabalho (camada de baixo: some atrás das janelas).
+(defpoll saudacao :interval "60s"
+  "h=$(date +%-H); if [ $h -lt 12 ]; then echo 'Bom dia'; elif [ $h -lt 18 ]; then echo 'Boa tarde'; else echo 'Boa noite'; fi")
+(defpoll data_longa :interval "60s" "LC_TIME=pt_BR.UTF-8 date '+%A, %-d de %B'")
+(defpoll resumo :interval "60s" :initial '{"bateria":"?","disco":"?","ligado":"?"}'
+  "~/.config/eww/scripts/resumo.sh")
+
+(defwindow boas-vindas
+  :monitor 0
+  :geometry (geometry :x "90px" :y "90px" :anchor "bottom left")
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  :namespace "boas-vindas"
+  (box :class "bv" :orientation "v" :space-evenly false :halign "start"
+    (label :class "bv-saudacao" :halign "start" :text "${saudacao}.")
+    (label :class "bv-hora" :halign "start" :text hora)
+    (label :class "bv-data" :halign "start" :text data_longa)
+    (box :class "bv-resumo" :space-evenly false :spacing 28 :halign "start"
+      (label :text "  ${resumo.bateria}%")
+      (label :text "  ${resumo.disco} livres")
+      (label :text "  ligado há ${resumo.ligado}"))))

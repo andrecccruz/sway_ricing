@@ -1,0 +1,75 @@
+/* Tema minimalista: cápsula sólida, texto fino, um único destaque. Cores no bloco TEMA. */
+
+/* TEMA-INICIO (gerado por ~/.config/temas/tema, não edite este bloco) */
+@define-color fundo #060c14;
+@define-color superficie rgba(143, 216, 255, 0.07);
+@define-color superficie_forte rgba(143, 216, 255, 0.12);
+@define-color trilho rgba(143, 216, 255, 0.15);
+@define-color contorno rgba(143, 216, 255, 0.12);
+@define-color texto rgba(207, 227, 240, 0.8);
+@define-color apagado rgba(207, 227, 240, 0.42);
+@define-color brilho #ffffff;
+@define-color destaque #3fd0ff;
+@define-color destaque_suave rgba(63, 208, 255, 0.16);
+@define-color destaque_borda rgba(63, 208, 255, 0.5);
+@define-color alerta #ff9a3c;
+@define-color veu rgba(6, 12, 20, 0.95);
+/* TEMA-FIM */
+
+* {
+    font-family: "Source Sans Pro", "FontAwesome 6 Free";
+    font-weight: 300;
+    font-size:   15px;
+}
+
+window {
+    background: @fundo;
+    border: 1px solid @contorno;
+    border-radius: 16px;
+}
+
+#outer-box {
+    padding: 14px;
+}
+
+#input {
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    color: @brilho;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid @contorno;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+}
+
+#input:focus {
+    border-bottom: 1px solid @destaque;
+}
+
+#inner-box,
+#scroll {
+    background: transparent;
+}
+
+#entry {
+    padding: 6px 10px;
+    border-radius: 10px;
+    border-left: 2px solid transparent;
+}
+
+#text {
+    color: @texto;
+    margin-left: 6px;
+}
+
+#entry:selected {
+    background: @superficie;
+    border-left: 2px solid @destaque;
+    outline: none;
+}
+
+#entry:selected #text {
+    color: @brilho;
+}

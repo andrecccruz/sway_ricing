@@ -1,0 +1,18 @@
+# Claro (Rosé Pine Dawn): papel off-white, texto grafite, destaque verde-petróleo.
+nome = "Claro"
+esquema = "light"
+papel = "#f2e9e1"
+
+[cores]
+fundo    = "#faf4ed"
+tinta    = "#575279"
+texto    = "#575279"
+brilho   = "#26233a"
+destaque = "#286983"
+alerta   = "#b4637a"
+
+[terminal]
+fundo  = "#faf4ed"
+texto  = "#575279"
+normal = ["#f2e9e1", "#b4637a", "#286983", "#ea9d34", "#56949f", "#907aa9", "#d7827e", "#575279"]
+claro  = ["#9893a5", "#b4637a", "#286983", "#ea9d34", "#56949f", "#907aa9", "#d7827e", "#575279"]

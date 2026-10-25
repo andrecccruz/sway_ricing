@@ -1,0 +1,353 @@
+// Cores: bloco TEMA abaixo, gerado a partir de ~/.config/temas/<tema>.toml
+
+// TEMA-INICIO (gerado por ~/.config/temas/tema, não edite este bloco)
+$fundo: #060c14;
+$superficie: rgba(143, 216, 255, 0.07);
+$superficie_forte: rgba(143, 216, 255, 0.12);
+$trilho: rgba(143, 216, 255, 0.15);
+$contorno: rgba(143, 216, 255, 0.12);
+$texto: rgba(207, 227, 240, 0.8);
+$apagado: rgba(207, 227, 240, 0.42);
+$brilho: #ffffff;
+$destaque: #3fd0ff;
+$destaque_suave: rgba(63, 208, 255, 0.16);
+$destaque_borda: rgba(63, 208, 255, 0.5);
+$alerta: #ff9a3c;
+$veu: rgba(6, 12, 20, 0.95);
+// TEMA-FIM
+
+* {
+    all: unset;
+    font-family: "Source Sans Pro", "Font Awesome 6 Free", "Font Awesome 6 Brands";
+    font-weight: 300;
+    font-size: 14px;
+    color: $texto;
+}
+
+// A aba cobre o centro da waybar (mesma cor, sem borda) e desce um pouco abaixo
+// dela, como uma continuação da barra. Sem cantos côncavos: neste GTK, imagens e
+// gradientes com transparência saem pretos em áreas vazias da janela.
+.aba {
+    min-width: 280px;
+    background: $fundo;
+    border-radius: 0 0 22px 22px;
+    padding: 0 18px;
+    transition: all 300ms ease;
+}
+
+.aba.aberta {
+    border-radius: 0 0 30px 30px;
+    padding: 0 22px 20px 22px;
+}
+
+.compacta {
+    min-height: 34px;
+}
+
+.hora {
+    color: $brilho;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+}
+
+.ponto {
+    color: $apagado;
+}
+
+.data {
+    letter-spacing: 1px;
+}
+
+.icone-musica {
+    color: $destaque;
+    font-size: 12px;
+}
+
+.titulo-curto {
+    color: $brilho;
+}
+
+.barras {
+    color: $destaque;
+    font-family: "DejaVu Sans Mono";
+    font-size: 11px;
+}
+
+.painel {
+    min-width: 400px;
+    padding-top: 12px;
+}
+
+// Música
+.capa {
+    border-radius: 12px;
+    background-color: $superficie;
+    background-size: cover;
+    background-position: center;
+}
+
+.titulo {
+    color: $brilho;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.artista {
+    color: $apagado;
+    font-size: 13px;
+}
+
+.sem-musica {
+    color: $apagado;
+    padding: 6px 0;
+}
+
+.controles button {
+    font-size: 15px;
+    padding: 2px 2px;
+}
+
+.controles button:hover,
+.icone:hover {
+    color: $brilho;
+}
+
+// Sliders
+scale trough {
+    background: $trilho;
+    border-radius: 4px;
+    min-height: 4px;
+    min-width: 60px;
+}
+
+scale highlight {
+    background: $destaque;
+    border-radius: 4px;
+}
+
+scale slider {
+    background: $brilho;
+    border-radius: 50%;
+    min-width: 12px;
+    min-height: 12px;
+    margin: -4px 0;
+}
+
+.progresso {
+    margin: 6px 0 4px 0;
+}
+
+.progresso trough {
+    min-height: 3px;
+}
+
+.progresso highlight {
+    background: $texto;
+}
+
+.progresso slider {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    background: transparent;
+}
+
+.linha .icone {
+    min-width: 20px;
+}
+
+.valor {
+    color: $apagado;
+    font-size: 12px;
+    min-width: 34px;
+}
+
+// Botões rápidos
+.rapido {
+    background: $superficie;
+    border-radius: 14px;
+    padding: 10px 0 8px 0;
+    transition: all 200ms ease;
+}
+
+.rapido:hover {
+    background: $superficie_forte;
+}
+
+.rapido-icone {
+    font-size: 16px;
+}
+
+.rapido-nome {
+    color: $apagado;
+    font-size: 12px;
+}
+
+.rapido.ativo {
+    background: $destaque_suave;
+}
+
+.rapido.ativo .rapido-icone {
+    color: $destaque;
+}
+
+.rapido.ativo .rapido-nome {
+    color: $texto;
+}
+
+// Aviso rápido (volume, brilho, teclado) no lugar da hora
+.aviso-icone {
+    color: $destaque;
+    min-width: 18px;
+}
+
+.aviso-barra trough {
+    min-width: 150px;
+}
+
+.aviso-barra slider {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    background: transparent;
+}
+
+.aviso-texto {
+    color: $brilho;
+    min-width: 36px;
+    letter-spacing: 1px;
+}
+
+// Tela de energia
+.energia-fundo {
+    background-color: $veu;
+}
+
+.energia-titulo {
+    color: $brilho;
+    font-size: 30px;
+    letter-spacing: 2px;
+}
+
+.botao-energia {
+    min-width: 96px;
+    min-height: 96px;
+    border-radius: 48px;
+    background-color: $superficie;
+    border: 1px solid $contorno;
+    font-size: 30px;
+    transition: all 200ms ease;
+}
+
+.botao-energia:hover {
+    background-color: $destaque_suave;
+    border-color: $destaque_borda;
+}
+
+.botao-energia:hover label {
+    color: $destaque;
+}
+
+.energia-nome {
+    color: $texto;
+    font-size: 15px;
+}
+
+.energia-tecla {
+    color: $apagado;
+    font-size: 12px;
+}
+
+.energia-dica {
+    color: $apagado;
+    font-size: 13px;
+}
+
+// Seletor de temas
+.temas-fundo {
+    background-color: $veu;
+}
+
+.temas-titulo {
+    color: $brilho;
+    font-size: 26px;
+    letter-spacing: 2px;
+}
+
+.tema {
+    padding: 10px;
+    border-radius: 18px;
+    border: 1px solid transparent;
+    transition: all 200ms ease;
+}
+
+.tema:hover {
+    background-color: $superficie;
+}
+
+.tema.atual {
+    border-color: $destaque_borda;
+    background-color: $superficie;
+}
+
+.amostra {
+    min-width: 128px;
+    min-height: 80px;
+    border-radius: 12px;
+    border: 1px solid $contorno;
+}
+
+.bolinha {
+    min-width: 14px;
+    min-height: 14px;
+    border-radius: 7px;
+}
+
+.tema-nome {
+    color: $texto;
+}
+
+.tema.atual .tema-nome {
+    color: $brilho;
+}
+
+.temas-dica {
+    color: $apagado;
+    font-size: 13px;
+}
+
+// Boas-vindas na área de trabalho
+.bv label {
+    color: $brilho;
+    text-shadow: 0 1px 14px $fundo;
+}
+
+.bv-saudacao {
+    font-size: 40px;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.bv-hora {
+    font-size: 120px;
+    font-weight: 200;
+    letter-spacing: 4px;
+    margin: -10px 0 -6px -4px;
+}
+
+.bv-data {
+    font-size: 22px;
+}
+
+.bv-data,
+.bv-resumo label {
+    color: $texto;
+}
+
+.bv-resumo {
+    margin-top: 22px;
+}
+
+.bv-resumo label {
+    font-size: 15px;
+}

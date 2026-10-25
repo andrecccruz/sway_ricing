@@ -1,0 +1,14 @@
+# Tema original: azul-escuro com destaque dourado e foto do Webb.
+nome = "Espacial"
+esquema = "dark"
+papel = "~/.local/share/backgrounds/carina-webb.jpg"
+
+[cores]
+fundo    = "#030409"   # barra, island, menus
+tinta    = "#a0b4ff"   # base das superfícies translúcidas e contornos
+texto    = "#d6deff"
+brilho   = "#ffffff"   # texto em destaque (hora, item ativo)
+destaque = "#ffc977"
+alerta   = "#ff8a8a"
+
+# Sem [terminal]: o alacritty fica com as cores do openSUSE.

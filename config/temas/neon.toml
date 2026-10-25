@@ -1,0 +1,19 @@
+# Neon: cyberpunk liminar. Corredor vazio iluminado por neon magenta e ciano.
+# Base violeta escura, superfícies com tom magenta e destaque ciano vibrante.
+nome = "Neon"
+esquema = "dark"
+papel = "~/.local/share/backgrounds/neon.png"
+
+[cores]
+fundo    = "#0b0618"
+tinta    = "#ff2bd6"   # magenta: superfícies e contornos
+texto    = "#f0e4ff"
+brilho   = "#ffffff"
+destaque = "#00f0ff"   # ciano
+alerta   = "#ff3860"
+
+[terminal]
+fundo  = "#0b0618"
+texto  = "#f0e4ff"
+normal = ["#1e1233", "#ff3860", "#00ff9c", "#ffe600", "#3d8bff", "#ff2bd6", "#00f0ff", "#f0e4ff"]
+claro  = ["#5a3f82", "#ff6b8b", "#5cffbe", "#fff066", "#7aaeff", "#ff7ae6", "#7af7ff", "#ffffff"]

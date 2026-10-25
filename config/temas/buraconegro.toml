@@ -1,0 +1,19 @@
+# Buraco Negro: preto absoluto (mais escuro que o Mono), texto branco e um
+# único destaque quente, a luz do disco de acreção. Wallpaper gerado.
+nome = "Buraco Negro"
+esquema = "dark"
+papel = "~/.local/share/backgrounds/buraconegro.png"
+
+[cores]
+fundo    = "#000000"
+tinta    = "#ffffff"
+texto    = "#e6e6e6"
+brilho   = "#ffffff"
+destaque = "#ffc690"
+alerta   = "#ff7a6b"
+
+[terminal]
+fundo  = "#000000"
+texto  = "#d8d8d8"
+normal = ["#121212", "#d9776b", "#9fbf8f", "#e0bf86", "#8ea6bf", "#b49cc0", "#8fbfbf", "#d8d8d8"]
+claro  = ["#4d4d4d", "#ec8a7e", "#b2d2a2", "#f3d299", "#a1b9d2", "#c7afd3", "#a2d2d2", "#ffffff"]

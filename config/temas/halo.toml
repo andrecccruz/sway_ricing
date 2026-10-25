@@ -1,0 +1,19 @@
+# Halo: futurista militar-espacial. Aço azul-escuro, HUD ciano e um anel
+# orbital cruzando o céu sobre um planeta. Wallpaper gerado (sem marcas do jogo).
+nome = "Halo"
+esquema = "dark"
+papel = "~/.local/share/backgrounds/anel.png"
+
+[cores]
+fundo    = "#060c14"
+tinta    = "#8fd8ff"
+texto    = "#cfe3f0"
+brilho   = "#ffffff"
+destaque = "#3fd0ff"
+alerta   = "#ff9a3c"
+
+[terminal]
+fundo  = "#060c14"
+texto  = "#cfe3f0"
+normal = ["#14202c", "#e5735c", "#7fcf9f", "#e8c46a", "#4fa8e8", "#9f8fe0", "#3fd0ff", "#cfe3f0"]
+claro  = ["#3d5163", "#f2866f", "#92e2b2", "#f5d57d", "#62bbfb", "#b2a2f3", "#6fe0ff", "#ffffff"]

@@ -1,0 +1,12 @@
+# Gerados pelo script de temas (config/temas/tema) a cada troca
+config/sway/config.d/cores.conf
+config/alacritty/cores.toml
+config/temas/atual
+
+# Build do wallpaper animado
+extras/bolhas/bolhas
+extras/bolhas/*-protocol.c
+extras/bolhas/*-client-protocol.h
+
+__pycache__/
+*.pyc

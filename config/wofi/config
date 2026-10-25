@@ -1,0 +1,9 @@
+width=520
+height=380
+insensitive=true
+mode=drun,run
+prompt=Buscar
+allow_images=true
+image_size=22
+hide_scroll=true
+no_actions=true

@@ -1,0 +1,15 @@
+# Parte da config do openSUSE e acrescenta atalhos estilo Konsole.
+# cores.toml é gerado pelo seletor de temas (~/.config/temas/tema).
+import = ["/etc/alacritty/alacritty.toml", "~/.config/alacritty/cores.toml"]
+
+# O alacritty não tem abas: Ctrl+Shift+T abre outro terminal (na mesma pasta)
+# como janela do sway. Com o layout em abas do sway (Win+W) fica igual a abas.
+[[keyboard.bindings]]
+key = "T"
+mods = "Control|Shift"
+action = "SpawnNewInstance"
+
+[[keyboard.bindings]]
+key = "W"
+mods = "Control|Shift"
+action = "Quit"

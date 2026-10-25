@@ -1,0 +1,18 @@
+# Rosé Pine: base escura arroxeada com destaque rosa suave.
+nome = "Rosé Pine"
+esquema = "dark"
+papel = "#191724"
+
+[cores]
+fundo    = "#14121d"
+tinta    = "#e0def4"
+texto    = "#e0def4"
+brilho   = "#ffffff"
+destaque = "#ebbcba"
+alerta   = "#eb6f92"
+
+[terminal]
+fundo  = "#191724"
+texto  = "#e0def4"
+normal = ["#26233a", "#eb6f92", "#31748f", "#f6c177", "#9ccfd8", "#c4a7e7", "#ebbcba", "#e0def4"]
+claro  = ["#6e6a86", "#eb6f92", "#31748f", "#f6c177", "#9ccfd8", "#c4a7e7", "#ebbcba", "#e0def4"]
